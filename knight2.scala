@@ -10,19 +10,20 @@ def is_legal(dim: Int, path: Path)(x: Pos): Boolean = {
   else false
 }
 def legal_moves(dim: Int, path: Path, x: Pos): List[Pos] = {
-  val list = List((x._2 + 1, x._1 + 2), (x._2 + 2, x._1 + 1), (x._2 + 2, x._1 - 1), (x._2 + 1, x._1 - 2), (x._2 - 1, x._1 - 2), (x._2 - 2, x._1 - 1), (x._2 - 2, x._1 + 1), (x._2 - 1, x._1 + 2))
-  list.filter(x => is_legal(dim, path)(x))
+  List((x._2 + 1, x._1 + 2), (x._2 + 2, x._1 + 1), (x._2 + 2, x._1 - 1), (x._2 + 1, x._1 - 2), (x._2 - 1, x._1 - 2), (x._2 - 2, x._1 - 1), (x._2 - 2, x._1 + 1), (x._2 - 1, x._1 + 2)).filter(x => is_legal(dim, path)(x))
 }
-
 
 //(2a) Implement a first-function that finds the first 
 // element, say x, in the list xs where f is not None. 
 // In that case return f(x), otherwise none.
 
-def first(xs: List[Pos], f: Pos => Option[Path]): Option[Path] = {
-  if (xs.isEmpty) None
-  else if (f(xs.head) != None) f(xs.head)
-  else first(xs.drop(1), f)
+def first(xs: List[Pos], f: Pos => Option[Path]): Option[Path] = xs match {
+  case Nil => None //case xs.isEmpty
+  case x :: xs => {
+    val result = f(x)
+    if (result != None) result
+    else first(xs, f)
+  }
 }
 
 //(2b) Implement a function that uses the first-function for
@@ -30,16 +31,6 @@ def first(xs: List[Pos], f: Pos => Option[Path]): Option[Path] = {
 // *open* tour on a dim * dim-board.
 
 def first_tour(dim: Int, path: Path): Option[Path] = {
-  //use legalmoves -- how do we copy? immport???
-  //backtrack if tour is not complete
-  if (path.size == dim * dim ) Some[path]
-  else for (x <- legal_moves(dim, path, path(0))) yield first(path, Some[x])
-}
-
-def first_tour(dim: Int, path: Path): Option[Path] = {
-  for ((x,y) <- legal_moves(dim, path, path(0))) yield first(path, Some[(x,y)])
-}
-
-def first_tour(dim: Int, path: Path): Option[Path] = {
-  for ((x,y) <- legal_moves(dim, path, path(0))) yield first(legal_moves(dim, path, path(0)), Some[(x,y)])
+  if (path.size == dim * dim) Some(path)
+  else first(legal_moves(dim, path, path(0)), x => first_tour(dim, x :: path))
 }

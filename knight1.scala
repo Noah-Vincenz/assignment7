@@ -18,8 +18,7 @@ def is_legal(dim: Int, path: Path)(x: Pos): Boolean = {
 // The moves should be ordered in a "clockwise" order.
 
 def legal_moves(dim: Int, path: Path, x: Pos): List[Pos] = {
-  val list = List((x._2 + 1, x._1 + 2), (x._2 + 2, x._1 + 1), (x._2 + 2, x._1 - 1), (x._2 + 1, x._1 - 2), (x._2 - 1, x._1 - 2), (x._2 - 2, x._1 - 1), (x._2 - 2, x._1 + 1), (x._2 - 1, x._1 + 2))
-  list.filter(x => is_legal(dim, path)(x))
+  List((x._2 + 1, x._1 + 2), (x._2 + 2, x._1 + 1), (x._2 + 2, x._1 - 1), (x._2 + 1, x._1 - 2), (x._2 - 1, x._1 - 2), (x._2 - 2, x._1 - 1), (x._2 - 2, x._1 + 1), (x._2 - 1, x._1 + 2)).filter(x => is_legal(dim, path)(x))
 }
 
 //assert(legal_moves(8, Nil, (2,2)) == List((3,4), (4,3), (4,1), (3,0), (1,0), (0,1), (0,3), (1,4)))
@@ -39,19 +38,6 @@ def count_tours(dim: Int, path: Path): Int = {
   else (for ((x,y) <- legal_moves(dim, path, path(0))) yield count_tours(dim, (x,y) :: path)).sum[Int]
 }
 
-
-// this is for close tours: && legal_moves(dim, path.dropRight(1), path(0)) != path(path.size-1)
-/*
-def count_all(dim: Int, path: Path): Int = {
-  var count = 0;
-  for (n1 <- 0 until dim) {
-    for (n2 <- 0 until dim) {
-      count = count + count_tours(dim, List((n1, n2)))
-    }
-  }
-  count
-}
-*/
 
 def enum_tours(dim: Int, path: Path): List[Path] = {
   if (path.size == dim * dim) List(path)
