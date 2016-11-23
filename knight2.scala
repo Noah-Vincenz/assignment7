@@ -18,7 +18,7 @@ def legal_moves(dim: Int, path: Path, x: Pos): List[Pos] = {
 // In that case return f(x), otherwise none.
 
 def first(xs: List[Pos], f: Pos => Option[Path]): Option[Path] = xs match {
-  case Nil => None //case xs.isEmpty
+  case Nil => None
   case x :: xs => {
     val result = f(x)
     if (result != None) result

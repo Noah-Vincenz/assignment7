@@ -38,11 +38,7 @@ def count_tours(dim: Int, path: Path): Int = {
   else (for ((x,y) <- legal_moves(dim, path, path(0))) yield count_tours(dim, (x,y) :: path)).sum[Int]
 }
 
-
 def enum_tours(dim: Int, path: Path): List[Path] = {
   if (path.size == dim * dim) List(path)
   else (for (x <- legal_moves(dim, path, path(0))) yield enum_tours(dim, x :: path)).flatten
 }
-
-
-
