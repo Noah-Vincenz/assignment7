@@ -18,7 +18,7 @@ def is_legal(dim: Int, path: Path)(x: Pos): Boolean = {
 // The moves should be ordered in a "clockwise" order.
 
 def legal_moves(dim: Int, path: Path, x: Pos): List[Pos] = {
-  List((x._2 + 1, x._1 + 2), (x._2 + 2, x._1 + 1), (x._2 + 2, x._1 - 1), (x._2 + 1, x._1 - 2), (x._2 - 1, x._1 - 2), (x._2 - 2, x._1 - 1), (x._2 - 2, x._1 + 1), (x._2 - 1, x._1 + 2)).filter(x => is_legal(dim, path)(x))
+  List((x._1 + 1, x._2 + 2), (x._1 + 2, x._2 + 1), (x._1 + 2, x._2 - 1), (x._1 + 1, x._2 - 2), (x._1 - 1, x._2 - 2), (x._1 - 2, x._2 - 1), (x._1 - 2, x._2 + 1), (x._1 - 1, x._2 + 2)).filter(x => is_legal(dim, path)(x))
 }
 
 //assert(legal_moves(8, Nil, (2,2)) == List((3,4), (4,3), (4,1), (3,0), (1,0), (0,1), (0,3), (1,4)))
