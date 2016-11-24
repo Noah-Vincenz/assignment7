@@ -9,9 +9,14 @@ def is_legal(dim: Int, path: Path)(x: Pos): Boolean = {
   if (x._1 >= 0 && x._1 < dim && x._2 >= 0 && x._2 < dim && !path.contains(x)) true
   else false
 }
+def is_legal(dim: Int, path: Path)(x: Pos): Boolean = {
+  if (x._1 >= 0 && x._1 < dim && x._2 >= 0 && x._2 < dim && !path.contains(x)) true
+  else false
+}
 def legal_moves(dim: Int, path: Path, x: Pos): List[Pos] = {
   List((x._1 + 1, x._2 + 2), (x._1 + 2, x._2 + 1), (x._1 + 2, x._2 - 1), (x._1 + 1, x._2 - 2), (x._1 - 1, x._2 - 2), (x._1 - 2, x._2 - 1), (x._1 - 2, x._2 + 1), (x._1 - 1, x._2 + 2)).filter(x => is_legal(dim, path)(x))
 }
+import scala.annotation.tailrec
 
 //(2a) Implement a first-function that finds the first 
 // element, say x, in the list xs where f is not None. 
@@ -35,9 +40,6 @@ def first(xs: List[Pos], f: Pos => Option[Path]): Option[Path] = xs match {
 // trying out onward moves, and searches recursively for an 
 // *open* tour on a dim * dim-board.
 
-import scala annotation.tailrec
-
-@tailrec
 def first_tour(dim: Int, path: Path): Option[Path] = {
   if (path.size == dim * dim) Some(path)
   else first(legal_moves(dim, path, path(0)), x => first_tour(dim, x :: path))

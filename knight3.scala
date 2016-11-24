@@ -13,6 +13,15 @@ def is_legal(dim: Int, path: Path)(x: Pos): Boolean = {
 def legal_moves(dim: Int, path: Path, x: Pos): List[Pos] = {
   List((x._1 + 1, x._2 + 2), (x._1 + 2, x._2 + 1), (x._1 + 2, x._2 - 1), (x._1 + 1, x._2 - 2), (x._1 - 1, x._2 - 2), (x._1 - 2, x._2 - 1), (x._1 - 2, x._2 + 1), (x._1 - 1, x._2 + 2)).filter(x => is_legal(dim, path)(x))
 }
+def first(xs: List[Pos], f: Pos => Option[Path]): Option[Path] = xs match {
+  case Nil => None
+  case x :: xs => {
+    val result = f(x)
+    if (result.isDefined) result
+    else first(xs, f)
+  }
+}
+import scala.annotation.tailrec
 
 //(3a) Complete the function that calculates a list of onward
 // moves like in (1b) but orders them according to the Warnsdorf’s 
@@ -23,19 +32,60 @@ def ordered_moves(dim: Int, path: Path, x: Pos): List[Pos] = {
   List((x._1 + 1, x._2 + 2), (x._1 + 2, x._2 + 1), (x._1 + 2, x._2 - 1), (x._1 + 1, x._2 - 2), (x._1 - 1, x._2 - 2), (x._1 - 2, x._2 - 1), (x._1 - 2, x._2 + 1), (x._1 - 1, x._2 + 2)).filter(x => is_legal(dim, path)(x)).sortWith((legal_moves(dim, path, _).size < legal_moves(dim, path, _).size))
 }
 
-sort by the number of onward legal moves
+//(3b) Complete the function that searches for a single *closed* 
+// tour using the ordered moves function.
+def isInReach(a: Pos, b: Pos): Boolean = {
+  if (b == (a._1 + 1, a._2 + 2) ||
+    b == (a._1 + 2, a._2 + 1) ||
+    b == (a._1 + 2, a._2 - 1) ||
+    b == (a._1 + 1, a._2 - 2) ||
+    b == (a._1 - 1, a._2 - 2) ||
+    b == (a._1 - 2, a._2 - 1) ||
+    b == (a._1 - 2, a._2 + 1) ||
+    b == (a._1 - 1, a._2 + 2)
+  ) true
+  else false
+}
+def first_closed_tour_heuristic(dim: Int, path: Path): Option[Path] = {
+  if (path.size == dim * dim && isInReach(path.head, path(path.size - 1)) == true) Some(path)
+  else first(ordered_moves(dim, path, path(0)), x => first_closed_tour_heuristic(dim, x :: path))
+}
 
-def lessOnwardMoves(p1: Pos, p2: Pos, dim: Int, path: Path): Boolean = (p1, p2) match {
-  case (legal_moves(dim, path, p1).size < legal_moves(dim, path, p2).size) => true
-  case (legal_moves(dim, path, p1).size > legal_moves(dim, path, p2).size) => false
+//(3c) Same as (3b) but searches for *open* tours.
+/*
+@tailrec
+def first_tour_heuristic(dim: Int, path: Path): Option[Path] = {
+  if (path.size == dim * dim) Some(path)
+  else first(ordered_moves(dim, path, path(0)), x => first_closed_tour_heuristic(dim, x :: path))
+}
+*/
+def first_tour_heuristicT(dim: Int, path: Path, acc: List[Path]): Option[Path] = acc match {
+  case Nil => None
+  case x::xs =>
+    if (dim * dim < x.size) first_tour_heuristicT(dim, path, xs)
+    else if (x.size == dim * dim) Some(x)
+    else first_tour_heuristicT(dim, path, ordered_moves(dim, path, path(0)).map(_::x) ::: xs)
+    //else first_tour_heuristicT(dim, path, path.map(_::x) ::: xs)
+  //ordered_moves(dim, path, path(0)), x => first_closed_tour_heuristic(dim, x :: path)
+}
+def first_tour_heuristic(dim: Int, path: Path): Option[Path] = {
+  first_tour_heuristicT(dim, path, ordered_moves(dim, path, path(0)).map(List(_)))
 }
 
 
-//(3b) Complete the function that searches for a single *closed* 
-// tour using the ordered moves function.
-
-def first_closed_tour_heuristic(dim: Int, path: Path): Option[Path] = ...
-
-//(3c) Same as (3b) but searches for *open* tours.
-
-def first_tour_heuristic(dim: Int, path: Path): Option[Path] = ...
+//total = dim: INT INT
+//coins = path: List[Int] List[Pos](Path)
+def search(total: Int, coins: List[Int], cs: List[Int]): Option[List[Int]] = {
+  if (total < cs.sum) None
+  else if (cs.sum == total) Some(cs)
+  else first_positive(coins, (c: Int) => search(total, coins, c::cs))
+}
+@tailrec
+def searchT(total: Int, coins: List[Int],
+            acc_cs: List[List[Int]]): Option[List[Int]] = acc_cs match {
+  case Nil => None
+  case x::xs =>
+    if (total < x.sum) searchT(total, coins, xs)
+    else if (x.sum == total) Some(x)
+    else searchT(total, coins, coins.filter(_ > 0).map(_::x) ::: xs)
+}
