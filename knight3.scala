@@ -59,22 +59,28 @@ def first_tour_heuristic(dim: Int, path: Path): Option[Path] = {
   else first(ordered_moves(dim, path, path(0)), x => first_closed_tour_heuristic(dim, x :: path))
 }
 */
-def first_tour_heuristicT(dim: Int, path: Path, acc: List[Path]): Option[Path] = acc match {
+@tailrec
+def first_tour_heuristicT(dim: Int, path: Path, accPath: List[Path]): Option[Path] = accPath match {
   case Nil => None
   case x::xs =>
-    if (dim * dim < x.size) first_tour_heuristicT(dim, path, xs)
-    else if (x.size == dim * dim) Some(x)
-    else first_tour_heuristicT(dim, path, ordered_moves(dim, path, path(0)).map(_::x) ::: xs)
+    //if (dim * dim < x.size) first_tour_heuristicT(dim, path, xs)
+    if (x.size == dim * dim) Some(x)
+    else first_tour_heuristicT(dim, path, ordered_moves(dim, path, accPath(0)(0)).map(_::x) ::: xs)
+    //else first_tour_heuristicT(dim, path, List(ordered_moves(dim, path, path(0)).head).map(_::x) ::: xs)
+    //else first_tour_heuristicT(dim, path, ordered_moves(dim, path, path(0)).map(_::x) ::: xs)
     //else first_tour_heuristicT(dim, path, path.map(_::x) ::: xs)
-  //ordered_moves(dim, path, path(0)), x => first_closed_tour_heuristic(dim, x :: path)
+    //ordered_moves(dim, path, path(0)), x => first_closed_tour_heuristicT(dim, x :: path)
 }
 def first_tour_heuristic(dim: Int, path: Path): Option[Path] = {
-  first_tour_heuristicT(dim, path, ordered_moves(dim, path, path(0)).map(List(_)))
+  //first_tour_heuristicT(dim, path, ordered_moves(dim, path, path(0)).map(List(_)))
+  first_tour_heuristicT(dim, path, path.map(List(_)))
 }
 
+//try with legal moves
 
 //total = dim: INT INT
 //coins = path: List[Int] List[Pos](Path)
+//cs = path?
 def search(total: Int, coins: List[Int], cs: List[Int]): Option[List[Int]] = {
   if (total < cs.sum) None
   else if (cs.sum == total) Some(cs)
@@ -89,3 +95,4 @@ def searchT(total: Int, coins: List[Int],
     else if (x.sum == total) Some(x)
     else searchT(total, coins, coins.filter(_ > 0).map(_::x) ::: xs)
 }
+val start_acc = coins.filter(_ > 0).map(List(_))
