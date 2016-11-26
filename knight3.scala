@@ -50,49 +50,32 @@ def first_closed_tour_heuristic(dim: Int, path: Path): Option[Path] = {
   if (path.size == dim * dim && isInReach(path.head, path(path.size - 1)) == true) Some(path)
   else first(ordered_moves(dim, path, path(0)), x => first_closed_tour_heuristic(dim, x :: path))
 }
-
-//(3c) Same as (3b) but searches for *open* tours.
 /*
-@tailrec
-def first_tour_heuristic(dim: Int, path: Path): Option[Path] = {
-  if (path.size == dim * dim) Some(path)
+def first_closed_tour_heuristic(dim: Int, path: Path): Option[Path] = {
+  val head = path.head
+  val tail = path(path.size - 1)
+  if (path.size == dim * dim && (
+      head == (tail._1 + 1, tail._2 + 2) ||
+      head == (tail._1 + 2, tail._2 + 1) ||
+      head == (tail._1 + 2, tail._2 + 1) ||
+      head == (tail._1 + 1, tail._2 + 2) ||
+      head == (tail._1 + 1, tail._2 + 2) ||
+      head == (tail._1 + 2, tail._2 + 1) ||
+      head == (tail._1 + 2, tail._2 + 1) ||
+      head == (tail._1 + 1, tail._2 + 2)
+    )) Some(path)
   else first(ordered_moves(dim, path, path(0)), x => first_closed_tour_heuristic(dim, x :: path))
 }
 */
+//(3c) Same as (3b) but searches for *open* tours.
+
 @tailrec
 def first_tour_heuristicT(dim: Int, path: Path, accPath: List[Path]): Option[Path] = accPath match {
   case Nil => None
   case x::xs =>
-    //if (dim * dim < x.size) first_tour_heuristicT(dim, path, xs)
     if (x.size == dim * dim) Some(x)
     else first_tour_heuristicT(dim, path, ordered_moves(dim, path, accPath(0)(0)).map(_::x) ::: xs)
-    //else first_tour_heuristicT(dim, path, List(ordered_moves(dim, path, path(0)).head).map(_::x) ::: xs)
-    //else first_tour_heuristicT(dim, path, ordered_moves(dim, path, path(0)).map(_::x) ::: xs)
-    //else first_tour_heuristicT(dim, path, path.map(_::x) ::: xs)
-    //ordered_moves(dim, path, path(0)), x => first_closed_tour_heuristicT(dim, x :: path)
 }
 def first_tour_heuristic(dim: Int, path: Path): Option[Path] = {
-  //first_tour_heuristicT(dim, path, ordered_moves(dim, path, path(0)).map(List(_)))
-  first_tour_heuristicT(dim, path, path.map(List(_)))
+  first_tour_heuristicT(dim, path, path :: ordered_moves(dim, path, path(0)).map(List(_)))
 }
-
-//try with legal moves
-
-//total = dim: INT INT
-//coins = path: List[Int] List[Pos](Path)
-//cs = path?
-def search(total: Int, coins: List[Int], cs: List[Int]): Option[List[Int]] = {
-  if (total < cs.sum) None
-  else if (cs.sum == total) Some(cs)
-  else first_positive(coins, (c: Int) => search(total, coins, c::cs))
-}
-@tailrec
-def searchT(total: Int, coins: List[Int],
-            acc_cs: List[List[Int]]): Option[List[Int]] = acc_cs match {
-  case Nil => None
-  case x::xs =>
-    if (total < x.sum) searchT(total, coins, xs)
-    else if (x.sum == total) Some(x)
-    else searchT(total, coins, coins.filter(_ > 0).map(_::x) ::: xs)
-}
-val start_acc = coins.filter(_ > 0).map(List(_))
