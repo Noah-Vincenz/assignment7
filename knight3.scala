@@ -50,23 +50,7 @@ def first_closed_tour_heuristic(dim: Int, path: Path): Option[Path] = {
   if (path.size == dim * dim && isInReach(path.head, path(path.size - 1)) == true) Some(path)
   else first(ordered_moves(dim, path, path(0)), x => first_closed_tour_heuristic(dim, x :: path))
 }
-/*
-def first_closed_tour_heuristic(dim: Int, path: Path): Option[Path] = {
-  val head = path.head
-  val tail = path(path.size - 1)
-  if (path.size == dim * dim && (
-      head == (tail._1 + 1, tail._2 + 2) ||
-      head == (tail._1 + 2, tail._2 + 1) ||
-      head == (tail._1 + 2, tail._2 + 1) ||
-      head == (tail._1 + 1, tail._2 + 2) ||
-      head == (tail._1 + 1, tail._2 + 2) ||
-      head == (tail._1 + 2, tail._2 + 1) ||
-      head == (tail._1 + 2, tail._2 + 1) ||
-      head == (tail._1 + 1, tail._2 + 2)
-    )) Some(path)
-  else first(ordered_moves(dim, path, path(0)), x => first_closed_tour_heuristic(dim, x :: path))
-}
-*/
+
 //(3c) Same as (3b) but searches for *open* tours.
 
 @tailrec
